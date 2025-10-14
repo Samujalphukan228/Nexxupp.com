@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ✅ Define theme variables */
+@theme inline {
+  /* Light mode colors */
+  --color-background: 0 0% 100%;
+  --color-foreground: 222.2 84% 4.9%;
+  --color-border: 240 5.9% 90%;
+  --color-ring: 240 5.9% 10%;
+
+  /* Dark mode overrides */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/* ✅ Define dark mode variant */
+@variant dark (&:is(.dark *)) {}
+
+/* ✅ Apply base styles */
+@layer base {
+  * {
+    @apply border-[hsl(var(--color-border))] outline-[hsl(var(--color-ring))]/50;
+  }
+  body {
+    @apply bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))];
+  }
+}
+
+
+#__next_dev_overlay {
+  display: none !important;
+}
+
+/* Apply to the whole page */
+::selection {
+  background-color: black; /* background when text is selected */
+  color: white;            /* text color when selected */
+}
+
+/* Firefox */
+::-moz-selection {
+  background-color: black;
+  color: white;
+}
