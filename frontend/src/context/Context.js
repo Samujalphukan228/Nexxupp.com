@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
-  const backendURL = "http://localhost:5000";
+  const backendURL = "https://nexxupp-com-backend.onrender.com";
   const [price, setPrice] = useState([]);
   const [loading, setLoading] = useState(false); // ✅ global loading
 
