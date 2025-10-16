@@ -18,7 +18,7 @@ const Feature197 = ({ features = [], image = "/images/placeholder.svg" }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           
-          {/* Accordion Section */}
+          {/* Accordion Section - No Borders */}
           <motion.div 
             className="w-full"
             initial={{ opacity: 0, x: -30 }}
@@ -36,14 +36,14 @@ const Feature197 = ({ features = [], image = "/images/placeholder.svg" }) => {
                 <AccordionItem
                   key={tab.id}
                   value={`item-${tab.id}`}
-                  className="border border-gray-200 rounded-2xl px-6 data-[state=open]:bg-gray-50 data-[state=open]:shadow-sm transition-all duration-500 ease-out"
+                  className="border-none px-0 data-[state=open]:bg-gray-50/50 rounded-xl transition-all duration-500 ease-out"
                 >
-                  <AccordionTrigger className="py-5 hover:no-underline text-left group">
-                    <h3 className="text-base md:text-lg font-semibold text-gray-900 group-data-[state=open]:text-blue-400 transition-all duration-500">
+                  <AccordionTrigger className="py-4 px-4 hover:no-underline text-left group hover:bg-gray-50/80 rounded-lg transition-colors duration-300">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900 group-data-[state=open]:text-blue-600 transition-all duration-500">
                       {tab.title}
                     </h3>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-5 pt-1">
+                  <AccordionContent className="pb-4 pt-1 px-4">
                     <motion.p 
                       className="text-sm md:text-base text-gray-600 leading-relaxed"
                       initial={{ opacity: 0, y: -10 }}
@@ -58,7 +58,7 @@ const Feature197 = ({ features = [], image = "/images/placeholder.svg" }) => {
             </Accordion>
           </motion.div>
 
-          {/* Image Section */}
+          {/* Image Section - Balanced Size, No Mobile Hover/Shadow */}
           <motion.div 
             className="w-full order-first lg:order-last"
             initial={{ opacity: 0, x: 30 }}
@@ -66,12 +66,12 @@ const Feature197 = ({ features = [], image = "/images/placeholder.svg" }) => {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
           >
-            <div className="relative aspect-[3/4] sm:aspect-[4/3] overflow-hidden rounded-2xl shadow-xl group">
+            <div className="relative aspect-[3/4] sm:aspect-[4/3] overflow-hidden rounded-2xl md:shadow-xl group">
               <Image
                 src={image}
                 alt="Feature preview"
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="object-cover md:transition-transform md:duration-700 md:ease-out md:group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />

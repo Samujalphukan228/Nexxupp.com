@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
-  const backendURL = "https://nexxupp-com-backend.onrender.com";
+  const backendURL = " http://localhost:5000";
   const router = useRouter();
 
   const [token, setToken] = useState(null);

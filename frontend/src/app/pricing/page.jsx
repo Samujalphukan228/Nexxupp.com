@@ -18,10 +18,7 @@ export default function PricingCards() {
         router.push(`/contact?priceCardId=${planId}`);
     };
 
-    // Show loading from global layout if price is empty
-    if (!price.length) {
-        return null; // Global layout loader will show
-    }
+    if (!price.length) return null; // Show global loader
 
     return (
         <div className="py-20 sm:py-32 px-4 sm:px-8">
@@ -51,10 +48,10 @@ export default function PricingCards() {
                     {price.map((plan) => (
                         <div
                             key={plan._id}
-                            className={`group relative border rounded-sm p-8 sm:p-10 transition-all duration-700 ease-out flex flex-col h-full ${plan.popular
-                                    ? "border-gray-800 shadow-sm scale-[1.02]"
-                                    : "border-gray-200 hover:border-gray-400 hover:shadow-sm"
-                                }`}
+                            className={`group relative border rounded-lg p-8 sm:p-10 transition-all duration-700 ease-out flex flex-col h-full ${plan.popular
+                                ? "border-gray-800 shadow-sm scale-[1.02]"
+                                : "border-gray-200 hover:border-gray-400 hover:shadow-sm"
+                            }`}
                         >
                             {/* Popular Badge */}
                             {plan.popular && (
@@ -63,7 +60,7 @@ export default function PricingCards() {
                                 </div>
                             )}
 
-                            {/* Content - Flex grow to push button down */}
+                            {/* Content */}
                             <div className="flex flex-col h-full">
 
                                 {/* Header */}
@@ -82,7 +79,7 @@ export default function PricingCards() {
                                     </div>
                                 </div>
 
-                                {/* Features - Flex grow */}
+                                {/* Features */}
                                 <ul className="space-y-3 py-6 flex-grow">
                                     {(plan.features || []).map((feature) => (
                                         <li key={feature} className="flex items-start gap-2.5">
@@ -101,14 +98,14 @@ export default function PricingCards() {
                                     ))}
                                 </ul>
 
-                                {/* CTA Button - Always at bottom */}
+                                {/* CTA Button */}
                                 <div className="pt-6 mt-auto">
-                                    <button 
+                                    <button
                                         onClick={() => handleChoosePlan(plan._id)}
-                                        className="group bg-black text-white text-[11px] tracking-[0.2em] uppercase font-semibold px-6 sm:px-8 py-5 sm:py-6 rounded-full hover:bg-gray-800 transition-all duration-500 ease-out flex items-center justify-center gap-3 w-full sm:w-auto sm:flex-shrink-0 cursor-pointer"
+                                        className="group bg-black text-white text-[12px] sm:text-[13px] tracking-[0.25em] uppercase font-semibold px-8 sm:px-10 py-5 sm:py-6 rounded-xl hover:bg-gray-800 transition-all duration-500 ease-out flex items-center justify-center gap-4 w-full sm:w-auto sm:flex-shrink-0 cursor-pointer"
                                     >
                                         Talk to us
-                                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-white/40 transition-all duration-500">
+                                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-white/40 transition-all duration-500">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                             </svg>
@@ -125,7 +122,7 @@ export default function PricingCards() {
                     <p className="text-[14px] sm:text-[15px] text-gray-500 font-light mb-6">
                         All plans include 30-day money-back guarantee • Premium support • No hidden fees
                     </p>
-                    <button 
+                    <button
                         onClick={() => router.push('/contact')}
                         className="inline-flex items-center gap-3 text-gray-700 text-[13px] font-medium group cursor-pointer hover:gap-4 transition-all duration-500 ease-out"
                     >

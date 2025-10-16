@@ -1,25 +1,23 @@
 "use client";
 
 import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
-  const backendURL = "https://nexxupp-com-backend.onrender.com";
+  const backendURL = "http://localhost:5000";
   const [price, setPrice] = useState([]);
-  const [loading, setLoading] = useState(false); // ✅ global loading
+  const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true); // ensures loader shows on static sites
 
   const fetchPrices = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${backendURL}/api/price/all`);
-      if (response.data.success) {
-        setPrice(response.data.prices || []);
-      } else {
-        toast.error(response.data.message || "Failed to fetch prices");
-      }
+      if (response.data.success) setPrice(response.data.prices || []);
+      else toast.error(response.data.message || "Failed to fetch prices");
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     } finally {
@@ -31,11 +29,8 @@ const ContextProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(`${backendURL}/api/query/add`, { email, priceCardId, message });
-      if (response.data.success) {
-        toast.success(response.data.message || "Query submitted successfully!");
-      } else {
-        toast.error(response.data.message || "Failed to submit query.");
-      }
+      if (response.data.success) toast.success(response.data.message || "Query submitted successfully!");
+      else toast.error(response.data.message || "Failed to submit query.");
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || "Failed to submit query.");
     } finally {
@@ -43,8 +38,14 @@ const ContextProvider = ({ children }) => {
     }
   };
 
+  // Hide first-load loader after brief delay
+  useEffect(() => {
+    const timeout = setTimeout(() => setFirstLoad(false), 100); 
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
-    <AppContext.Provider value={{ price, fetchPrices, addQuery, loading }}>
+    <AppContext.Provider value={{ price, fetchPrices, addQuery, loading, firstLoad }}>
       {children}
     </AppContext.Provider>
   );

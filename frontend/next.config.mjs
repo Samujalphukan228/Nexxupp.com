@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // enables static export
+  output: 'export',  // static export
   images: {
+    unoptimized: true,  // disables image optimization
     remotePatterns: [
       {
         protocol: 'https',
@@ -11,4 +12,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig;  // ESM style export
+export default nextConfig;  // ✅ Changed from module.exports
