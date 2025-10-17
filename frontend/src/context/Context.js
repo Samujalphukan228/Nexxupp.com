@@ -8,8 +8,7 @@ export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
 
-
-  const backendURL = "https://nexxupp-com-backend.vercel.app";
+  const backendURL = "https://nexxupp-com-backend.vercel.app/";
 
 
 
