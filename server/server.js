@@ -30,6 +30,10 @@ app.use('/api/price', priceRoutes);
 app.use('/api/query', queryrouter);
 app.use('/api/project', projectRouter);
 
+app.get('/', (req, res) => {
+  res.json({ message: "Server is working!" });
+});
+
 
 // Start server
 app.listen(port, () => {
