@@ -93,26 +93,7 @@ export const servicesData = [
   },
 ];
 
-export const plans = [
-        {
-            name: "Basic",
-            price: "$19",
-            features: ["1 Website", "Basic Support", "10GB Storage"],
-            popular: false,
-        },
-        {
-            name: "Pro",
-            price: "$49",
-            features: ["5 Websites", "Priority Support", "50GB Storage"],
-            popular: true, // Highlighted plan
-        },
-        {
-            name: "Enterprise",
-            price: "$99",
-            features: ["Unlimited Websites", "24/7 Support", "200GB Storage"],
-            popular: false,
-        },
-    ];
+
 
 
 
