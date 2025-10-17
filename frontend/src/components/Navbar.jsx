@@ -18,33 +18,32 @@ const Navbar = () => {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
+    // Throttled scroll listener for performance
     useEffect(() => {
+        let ticking = false;
         const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            
-            if (currentScrollY < 10) {
-                setIsVisible(true);
-            } else if (currentScrollY > lastScrollY) {
-                // Scrolling down
-                setIsVisible(false);
-            } else {
-                // Scrolling up
-                setIsVisible(true);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+
+                    if (currentScrollY < 10) setIsVisible(true);
+                    else if (currentScrollY > lastScrollY) setIsVisible(false);
+                    else setIsVisible(true);
+
+                    setLastScrollY(currentScrollY);
+                    ticking = false;
+                });
+                ticking = true;
             }
-            
-            setLastScrollY(currentScrollY);
         };
 
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, [lastScrollY]);
 
+    // Lock body scroll when mobile menu is open
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "unset";
-        }
+        document.body.style.overflow = isOpen ? "hidden" : "unset";
         return () => {
             document.body.style.overflow = "unset";
         };
@@ -118,16 +117,14 @@ const Navbar = () => {
                             onClick={toggleMenu}
                         />
 
-                        {/* Side Menu with Rounded Corners */}
+                        {/* Side Menu */}
                         <motion.div
                             className="fixed top-0 right-0 w-80 h-screen bg-white z-50 p-8 flex flex-col lg:hidden shadow-2xl rounded-l-3xl"
                             initial={{ x: "100%", opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: "100%", opacity: 0 }}
-                            transition={{ 
-                                duration: 0.4, 
-                                ease: [0.25, 0.1, 0.25, 1]
-                            }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            style={{ willChange: "transform" }}
                         >
                             {/* Header */}
                             <div className="flex justify-between items-center mb-12">
@@ -143,39 +140,24 @@ const Navbar = () => {
 
                             {/* Links */}
                             <nav className="flex flex-col gap-2">
-                                {navLinks.map((link, index) => (
-                                    <motion.div
+                                {navLinks.map((link) => (
+                                    <Link
                                         key={link.href}
-                                        initial={{ x: 20, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ 
-                                            delay: 0.1 + index * 0.05,
-                                            duration: 0.3,
-                                            ease: "easeOut"
-                                        }}
+                                        href={link.href}
+                                        onClick={handleLinkClick}
+                                        className="block px-5 py-3.5 text-gray-700 text-base font-medium hover:text-black hover:bg-gray-50 rounded-xl transition-all duration-300"
                                     >
-                                        <Link
-                                            href={link.href}
-                                            onClick={handleLinkClick}
-                                            className="block px-5 py-3.5 text-gray-700 text-base font-medium hover:text-black hover:bg-gray-50 rounded-xl transition-all duration-300"
-                                        >
-                                            {link.name}
-                                        </Link>
-                                    </motion.div>
+                                        {link.name}
+                                    </Link>
                                 ))}
                             </nav>
 
                             {/* CTA */}
-                            <motion.div 
-                                className="mt-auto"
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.3, duration: 0.4 }}
-                            >
+                            <div className="mt-auto">
                                 <button className="w-full bg-black text-white py-3.5 rounded-full text-sm font-medium hover:bg-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl">
                                     Get Started
                                 </button>
-                            </motion.div>
+                            </div>
                         </motion.div>
                     </>
                 )}

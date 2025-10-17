@@ -8,11 +8,9 @@ export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
 
-<<<<<<< HEAD
-  const backendURL = "https://nexxupp-com-backend.vercel.app/";
-=======
+
   const backendURL = "https://nexxupp-com-backend.vercel.app";
->>>>>>> b781c5fea976ec8a5b82872d07394932909de46f
+
 
 
   const [price, setPrice] = useState([]);
