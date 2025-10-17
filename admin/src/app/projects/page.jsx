@@ -11,7 +11,7 @@ const ProjectsAddPage = () => {
     const [projectName, setProjectName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
-    const [link, setLink] = useState(""); // <-- Added link state
+    const [link, setLink] = useState("");
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [error, setError] = useState("");
@@ -21,7 +21,7 @@ const ProjectsAddPage = () => {
     
     // Display states
     const [searchTerm, setSearchTerm] = useState("");
-    const [viewMode, setViewMode] = useState("grid"); // grid or list
+    const [viewMode, setViewMode] = useState("grid");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -102,7 +102,7 @@ const ProjectsAddPage = () => {
             formData.append("title", projectName);
             formData.append("description", description);
             formData.append("category", category);
-            formData.append("link", link); // <-- Add link to form data
+            formData.append("link", link);
             formData.append("image", image);
 
             await addProject(formData);
@@ -110,7 +110,7 @@ const ProjectsAddPage = () => {
             setProjectName("");
             setDescription("");
             setCategory("");
-            setLink(""); // <-- Reset link
+            setLink("");
             setImage(null);
             setImagePreview(null);
             setTouched({ projectName: false, description: false });
@@ -131,7 +131,7 @@ const ProjectsAddPage = () => {
     };
 
     return (
-        <section className=" py-8 sm:py-12 px-4 min-h-screen">
+        <section className="py-8 sm:py-12 px-4 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 
                 {/* Header */}
@@ -474,6 +474,37 @@ const ProjectsAddPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 transform transition-all">
+                        <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                            <FiAlertCircle className="text-red-600 text-3xl" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                            Delete Project?
+                        </h3>
+                        <p className="text-gray-600 text-center mb-6">
+                            Are you sure you want to delete this project? This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleDelete(deleteConfirm)}
+                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 };
