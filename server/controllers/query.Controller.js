@@ -114,7 +114,7 @@ const getUserEmailHTML = (email, priceCard, message) => {
 };
 
 /**
- * Add a new pricing query (optimized)
+ * Add a new pricing query
  */
 export const addQuery = async (req, res) => {
     try {
@@ -129,38 +129,39 @@ export const addQuery = async (req, res) => {
             return res.status(404).json({ success: false, message: "Invalid plan ID." });
         }
 
-        const newQuery = await queryModel.create({ email, priceCardId, message });
+        const newQuery = new queryModel({ email, priceCardId, message });
+        await newQuery.save();
 
-        // ✅ Respond immediately
-        res.json({ success: true, message: "Query received successfully!" });
+        // Send to admin
+        try {
+            await mailer.sendMail({
+                from: `"Nexupp" <${process.env.ADMIN_EMAIL}>`,
+                to: process.env.ADMIN_EMAIL,
+                replyTo: email,
+                subject: `New Pricing Query — ${priceCard.category}`,
+                html: getAdminEmailHTML(email, priceCard, message),
+            });
+        } catch (err) {
+            console.error("❌ Admin email failed:", err);
+        }
 
-        // ⚙️ Continue email sending in background
-        (async () => {
-            try {
-                await mailer.sendMail({
-                    from: `"Nexupp" <${process.env.ADMIN_EMAIL}>`,
-                    to: process.env.ADMIN_EMAIL,
-                    replyTo: email,
-                    subject: `New Pricing Query — ${priceCard.category}`,
-                    html: getAdminEmailHTML(email, priceCard, message),
-                });
+        // Send auto-reply to user
+        try {
+            await mailer.sendMail({
+                from: `"Nexupp" <${process.env.ADMIN_EMAIL}>`,
+                to: email,
+                replyTo: process.env.ADMIN_EMAIL,
+                subject: "Thanks for Your Interest!",
+                html: getUserEmailHTML(email, priceCard, message),
+            });
+        } catch (err) {
+            console.error("❌ Auto-reply to user failed:", err);
+        }
 
-                await mailer.sendMail({
-                    from: `"Nexupp" <${process.env.ADMIN_EMAIL}>`,
-                    to: email,
-                    replyTo: process.env.ADMIN_EMAIL,
-                    subject: "Thanks for Your Interest!",
-                    html: getUserEmailHTML(email, priceCard, message),
-                });
-
-                console.log(`✅ Emails sent for query by ${email}`);
-            } catch (err) {
-                console.error("❌ Email sending failed:", err);
-            }
-        })();
+        res.json({ success: true, message: "Query saved. Emails attempted." });
 
     } catch (error) {
-        console.error("❌ Query submission failed:", error);
+        console.error("❌ Email sending failed:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
@@ -180,12 +181,10 @@ export const getAllQueries = async (req, res) => {
     }
 };
 
-/**
- * Remove a query
- */
+
 export const removeQueies = async (req, res) => {
     try {
-        const { id } = req.query;
+        const { id } = req.query; // get ID from query parameters
         if (!id) return res.status(400).json({ success: false, message: "Query ID is required" });
 
         const deleted = await queryModel.findByIdAndDelete(id);
@@ -197,4 +196,3 @@ export const removeQueies = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
