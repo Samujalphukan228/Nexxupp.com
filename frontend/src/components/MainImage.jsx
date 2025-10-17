@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 const MainImage = () => {
   const [visibleMessages, setVisibleMessages] = useState([]);
@@ -35,10 +36,21 @@ const MainImage = () => {
     return () => timeoutIds.forEach(id => clearTimeout(id));
   }, []);
 
-  return (
-    <div className="relative w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-      <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[650px] rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl">
+  // Framer Motion variants for entrance
+  const containerVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+  };
 
+  return (
+    <motion.div
+      className="relative w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* The rest of your component stays 100% identical */}
+      <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[650px] rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl">
         {/* Background Image */}
         <Image
           src="/image-nexx.avif"
@@ -47,16 +59,11 @@ const MainImage = () => {
           className="object-cover"
           priority
         />
-
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/10 to-black/40" />
         <div className="absolute inset-0 backdrop-blur-[1px]" />
 
-        {/* Chat Container */}
         <div className="absolute inset-0 flex flex-col justify-center items-center px-3 sm:px-6">
-
           <div className="w-full max-w-[95%] sm:max-w-md bg-white/5 backdrop-blur-xl rounded-xl sm:rounded-2xl lg:rounded-3xl border border-white/20 shadow-2xl p-4 sm:p-5">
-
             {/* Chat Header */}
             <div className="flex items-center gap-2.5 sm:gap-3 pb-3 sm:pb-4 mb-3 sm:mb-4 border-b border-white/10">
               <div className="relative">
@@ -85,7 +92,6 @@ const MainImage = () => {
                       <span className="text-white text-[10px] sm:text-xs font-bold">N</span>
                     </div>
                   )}
-
                   <div className={`max-w-[80%] sm:max-w-[75%] ${message.type === 'sent' ? 'order-1' : 'order-2'}`}>
                     <div
                       className={`px-3 sm:px-4 py-2 sm:py-2.5 shadow-lg transition-all duration-300 hover:scale-[1.02] ${
@@ -105,7 +111,6 @@ const MainImage = () => {
                 </div>
               ))}
 
-              {/* Typing Indicator */}
               {showTyping && (
                 <div className="flex justify-start animate-slide-in">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mr-1.5 sm:mr-2 flex-shrink-0">
@@ -122,7 +127,7 @@ const MainImage = () => {
               )}
             </div>
 
-            {/* Input Area (Visual Only) */}
+            {/* Input Area */}
             <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 sm:px-4 py-2 sm:py-2.5 border border-white/20">
                 <input
@@ -153,19 +158,6 @@ const MainImage = () => {
       </div>
 
       <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(15px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        .animate-slide-in {
-          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -174,7 +166,7 @@ const MainImage = () => {
           scrollbar-width: none;
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 };
 
