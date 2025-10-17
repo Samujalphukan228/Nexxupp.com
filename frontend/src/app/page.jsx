@@ -43,13 +43,13 @@ const Page = () => {
 
       {/* First Feature Section */}
       <div className="w-full">
-        <Header1 text1="For Business" text2="Build for your business" />
+        <Header1 text1="The enterprise way" text2="Build for your Enterprise" />
         <Feature197 features={myFeatures} image="/nex-2img.avif" />
       </div>
 
       {/* Second Feature Section */}
       <div className="w-full">
-        <Header2 text1="For Business" text2="Build for your business" />
+        <Header2 text1="For Business" text2="Build for all business" />
         <Feature199 features={myFeatures2} image="/nex-3img.avif" />
       </div>
 
