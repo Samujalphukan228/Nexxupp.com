@@ -7,7 +7,11 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
+<<<<<<< HEAD
   const backendURL = "https://nexxupp-com-backend.onrender.com/";
+=======
+  const backendURL = "https://nexxupp-com-backend.onrender.com";
+>>>>>>> e8bda3bfe7f37dac74c926564b65d782f923cb9b
 
   const [price, setPrice] = useState([]);
   const [projects, setProjects] = useState([]); // renamed to plural for clarity
