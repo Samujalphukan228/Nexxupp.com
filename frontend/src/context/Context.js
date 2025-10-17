@@ -8,10 +8,13 @@ export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
   const backendURL = "http://localhost:5000";
-  const [price, setPrice] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true); // ensures loader shows on static sites
 
+  const [price, setPrice] = useState([]);
+  const [projects, setProjects] = useState([]); // renamed to plural for clarity
+  const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+
+  // Fetch price plans
   const fetchPrices = async () => {
     setLoading(true);
     try {
@@ -25,6 +28,21 @@ const ContextProvider = ({ children }) => {
     }
   };
 
+  // Fetch projects
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${backendURL}/api/project/all`);
+      if (response.data.success) setProjects(response.data.projects || []); // fixed key to `projects`
+      else toast.error(response.data.message || "Failed to fetch projects");
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add query
   const addQuery = async ({ email, priceCardId, message }) => {
     setLoading(true);
     try {
@@ -45,7 +63,15 @@ const ContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <AppContext.Provider value={{ price, fetchPrices, addQuery, loading, firstLoad }}>
+    <AppContext.Provider value={{
+      price,
+      fetchPrices,
+      projects,  
+      fetchProjects, 
+      addQuery,
+      loading,
+      firstLoad
+    }}>
       {children}
     </AppContext.Provider>
   );

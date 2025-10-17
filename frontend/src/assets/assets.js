@@ -114,3 +114,33 @@ export const plans = [
         },
     ];
 
+
+
+
+const projects = [
+    {
+      title: "Portfolio Website",
+      description: "A personal portfolio built with Next.js and Tailwind CSS.",
+      image: "https://picsum.photos/id/1015/800/600",
+      link: "https://portfolite.framer.website/",
+      tags: ["Next.js", "Tailwind CSS"],
+      year: "2024",
+    },
+    {
+      title: "E-commerce Store",
+      description: "A modern e-commerce store using React and Stripe API.",
+      image: "https://picsum.photos/id/1025/800/600",
+      link: "https://forever-five-iota.vercel.app/",
+      tags: ["React", "Stripe"],
+      year: "2024",
+    },
+    {
+      title: "Company site",
+      description: "A headless CMS blog powered by Next.js and Sanity.io.",
+      image: "https://picsum.photos/id/1040/800/600",
+      link: "https://better-closet-732185.framer.app/",
+      tags: ["Next.js", "Sanity.io"],
+      year: "2023",
+    },
+  ];
+

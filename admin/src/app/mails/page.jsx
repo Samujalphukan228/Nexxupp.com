@@ -4,12 +4,13 @@ import React, { useState, useMemo } from "react";
 import { useAppContext } from "@/context/Context";
 
 const QueriesPage = () => {
-    const { mail } = useAppContext();
+    const { mail, removeQuery } = useAppContext(); // Added removeQuery
     const [searchTerm, setSearchTerm] = useState("");
     const [filterPlan, setFilterPlan] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
-    const [viewMode, setViewMode] = useState("grid"); // grid or list
+    const [viewMode, setViewMode] = useState("grid");
     const [selectedQuery, setSelectedQuery] = useState(null);
+    const [deletingId, setDeletingId] = useState(null); // Track loading state
 
     // Get unique plan categories for filter
     const planCategories = useMemo(() => {
@@ -53,6 +54,15 @@ const QueriesPage = () => {
 
         return filtered;
     }, [mail, searchTerm, filterPlan, sortBy]);
+
+    // Handle delete with confirmation
+    const handleDelete = async (id, email) => {
+        if (window.confirm(`Are you sure you want to delete the query from ${email}?`)) {
+            setDeletingId(id);
+            await removeQuery(id);
+            setDeletingId(null);
+        }
+    };
 
     // Export to CSV
     const exportToCSV = () => {
@@ -257,8 +267,27 @@ const QueriesPage = () => {
                                 key={query._id}
                                 className="group relative bg-white border-2 border-gray-200 rounded-xl sm:rounded-2xl p-5 sm:p-7 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                             >
+                                {/* Delete Button - Top Right Corner */}
+                                <button
+                                    onClick={() => handleDelete(query._id, query.email)}
+                                    disabled={deletingId === query._id}
+                                    className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 sm:p-2.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-lg sm:rounded-xl transition-all duration-300 border border-red-200 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed group/delete"
+                                    title="Delete query"
+                                >
+                                    {deletingId === query._id ? (
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    ) : (
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover/delete:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    )}
+                                </button>
+
                                 {/* Top Row */}
-                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-5 pr-10 sm:pr-12">
                                     <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                                         {/* Index Badge */}
                                         <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm font-bold text-white bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-md">
@@ -327,8 +356,6 @@ const QueriesPage = () => {
                                         </div>
                                     </div>
                                 )}
-
-                                
                             </div>
                         ))}
                     </div>

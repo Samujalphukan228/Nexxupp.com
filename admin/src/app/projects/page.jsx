@@ -11,6 +11,7 @@ const ProjectsAddPage = () => {
     const [projectName, setProjectName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
+    const [link, setLink] = useState(""); // <-- Added link state
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [error, setError] = useState("");
@@ -31,10 +32,8 @@ const ProjectsAddPage = () => {
         fetchProjects();
     }, []);
 
-    // Get unique categories
     const categories = ["all", ...new Set(projects.map(p => p.category).filter(Boolean))];
 
-    // Filter projects
     const filteredProjects = projects.filter(project => {
         const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                              project.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -42,7 +41,6 @@ const ProjectsAddPage = () => {
         return matchesSearch && matchesCategory;
     });
 
-    // Validation
     const getProjectNameError = () => {
         if (!touched.projectName) return "";
         if (!projectName) return "Project name is required";
@@ -59,7 +57,6 @@ const ProjectsAddPage = () => {
 
     const isFormValid = projectName && description && image && !getProjectNameError() && !getDescriptionError();
 
-    // Image handling
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         processImage(file);
@@ -67,7 +64,7 @@ const ProjectsAddPage = () => {
 
     const processImage = (file) => {
         if (file) {
-            if (file.size > 5000000) { // 5MB limit
+            if (file.size > 5000000) {
                 setError("Image size should be less than 5MB");
                 return;
             }
@@ -77,44 +74,25 @@ const ProjectsAddPage = () => {
         }
     };
 
-    // Drag and drop handlers
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
-
+    const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
+    const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
     const handleDrop = (e) => {
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            processImage(file);
-        }
+        if (file && file.type.startsWith('image/')) processImage(file);
     };
 
     const removeImage = () => {
         setImage(null);
         setImagePreview(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    // Form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         setTouched({ projectName: true, description: true });
-
-        if (!isFormValid) {
-            setError("Please fill in all required fields correctly");
-            return;
-        }
+        if (!isFormValid) { setError("Please fill in all required fields correctly"); return; }
 
         setIsSubmitting(true);
         setError("");
@@ -124,19 +102,19 @@ const ProjectsAddPage = () => {
             formData.append("title", projectName);
             formData.append("description", description);
             formData.append("category", category);
+            formData.append("link", link); // <-- Add link to form data
             formData.append("image", image);
 
             await addProject(formData);
 
-            // Reset form
             setProjectName("");
             setDescription("");
             setCategory("");
+            setLink(""); // <-- Reset link
             setImage(null);
             setImagePreview(null);
             setTouched({ projectName: false, description: false });
             setSuccessMessage("Project added successfully! 🎉");
-            
             setTimeout(() => setSuccessMessage(""), 5000);
         } catch (err) {
             setError("Failed to add project. Please try again.");
@@ -145,7 +123,6 @@ const ProjectsAddPage = () => {
         }
     };
 
-    // Delete project
     const handleDelete = async (id) => {
         await removeProject(id);
         setDeleteConfirm(null);
@@ -280,6 +257,23 @@ const ProjectsAddPage = () => {
                                     </div>
                                 </div>
 
+                                {/* Link */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                        Project Link
+                                    </label>
+                                    <div className="relative">
+                                        <FiFileText className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={link}
+                                            onChange={(e) => setLink(e.target.value)}
+                                            className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl transition-all outline-none focus:border-blue-500"
+                                            placeholder="https://example.com"
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* Image Upload */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -340,95 +334,58 @@ const ProjectsAddPage = () => {
                                     className={`w-full py-3.5 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 ${
                                         isSubmitting || !isFormValid
                                             ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-lg transform hover:-translate-y-0.5'
+                                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:shadow-lg'
                                     }`}
                                 >
-                                    {isSubmitting ? (
-                                        <>
-                                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            <span>Adding Project...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FiPlusCircle className="text-xl" />
-                                            <span>Add Project</span>
-                                        </>
-                                    )}
+                                    {isSubmitting ? "Adding..." : "Add Project"}
                                 </button>
                             </form>
                         </div>
                     </div>
 
-                    {/* Projects List */}
+                    {/* Projects Display */}
                     <div className="lg:col-span-2">
-                        
-                        {/* Filters and Search */}
-                        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
-                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
-                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                    Projects
-                                    <span className="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-                                        {filteredProjects.length}
-                                    </span>
-                                </h2>
-                                
-                                {/* View Toggle */}
-                                <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-                                    <button
-                                        onClick={() => setViewMode("grid")}
-                                        className={`p-2 rounded transition-all ${
-                                            viewMode === "grid" 
-                                                ? 'bg-white text-blue-600 shadow-sm' 
-                                                : 'text-gray-600 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        <FiGrid className="text-lg" />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode("list")}
-                                        className={`p-2 rounded transition-all ${
-                                            viewMode === "list" 
-                                                ? 'bg-white text-blue-600 shadow-sm' 
-                                                : 'text-gray-600 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        <FiList className="text-lg" />
-                                    </button>
-                                </div>
+                        {/* Search & View */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                            <div className="flex items-center gap-3">
+                                <FiSearch className="text-gray-400 text-xl" />
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search projects..."
+                                    className="border-2 border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500 transition-all w-full sm:w-64"
+                                />
                             </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {/* Search */}
-                                <div className="relative">
-                                    <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search projects..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none transition-all"
-                                    />
-                                </div>
-
-                                {/* Category Filter */}
+                            <div className="flex items-center gap-3">
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none transition-all bg-white"
+                                    className="border-2 border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500 transition-all"
                                 >
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>
-                                            {cat === "all" ? "All Categories" : cat}
-                                        </option>
+                                    {categories.map((cat, idx) => (
+                                        <option key={idx} value={cat}>{cat}</option>
                                     ))}
                                 </select>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        className={`p-2 rounded-xl transition-all ${viewMode === "grid" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"}`}
+                                    >
+                                        <FiGrid />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("list")}
+                                        className={`p-2 rounded-xl transition-all ${viewMode === "list" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"}`}
+                                    >
+                                        <FiList />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Projects Display */}
+                        {/* Projects */}
                         {filteredProjects.length === 0 ? (
                             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center">
                                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -444,17 +401,12 @@ const ProjectsAddPage = () => {
                                 </p>
                             </div>
                         ) : (
-                            <div className={`grid gap-6 ${
-                                viewMode === "grid" 
-                                    ? 'grid-cols-1 sm:grid-cols-2' 
-                                    : 'grid-cols-1'
-                            }`}>
+                            <div className={`grid gap-6 ${viewMode === "grid" ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                                 {filteredProjects.map((proj) => (
                                     <div
                                         key={proj._id}
                                         className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
                                     >
-                                        {/* Image */}
                                         {proj.image && (
                                             <div className="relative h-48 overflow-hidden bg-gray-100">
                                                 <img
@@ -466,7 +418,6 @@ const ProjectsAddPage = () => {
                                             </div>
                                         )}
 
-                                        {/* Content */}
                                         <div className="p-5">
                                             <div className="flex items-start justify-between mb-3">
                                                 <div className="flex-1">
@@ -482,9 +433,21 @@ const ProjectsAddPage = () => {
                                                 </div>
                                             </div>
 
-                                            <p className="text-gray-600 text-sm leading-relaxed mb-3 line-clamp-2">
+                                            <p className="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-2">
                                                 {proj.description}
                                             </p>
+
+                                            {/* Project Link */}
+                                            {proj.link && (
+                                                <a
+                                                    href={proj.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-indigo-600 text-sm underline mb-3 block truncate"
+                                                >
+                                                    {proj.link}
+                                                </a>
+                                            )}
 
                                             <p className="text-gray-400 text-xs mb-4">
                                                 {new Date(proj.createdAt).toLocaleDateString('en-US', { 
@@ -494,7 +457,6 @@ const ProjectsAddPage = () => {
                                                 })}
                                             </p>
 
-                                            {/* Actions */}
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => setDeleteConfirm(proj._id)}
@@ -511,96 +473,7 @@ const ProjectsAddPage = () => {
                         )}
                     </div>
                 </div>
-
-                {/* Delete Confirmation Modal */}
-                {deleteConfirm && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                        <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-scale-in">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <FiTrash2 className="text-red-600 text-xl" />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-                                Delete Project?
-                            </h3>
-                            <p className="text-gray-600 text-center mb-6">
-                                This action cannot be undone. The project will be permanently deleted.
-                            </p>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => setDeleteConfirm(null)}
-                                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(deleteConfirm)}
-                                    className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
-
-            <style jsx>{`
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                }
-
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-
-                @keyframes scaleIn {
-                    from {
-                        opacity: 0;
-                        transform: scale(0.9);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: scale(1);
-                    }
-                }
-
-                .animate-shake {
-                    animation: shake 0.5s ease-in-out;
-                }
-
-                .animate-slide-down {
-                    animation: slideDown 0.3s ease-out;
-                }
-
-                .animate-fade-in {
-                    animation: fadeIn 0.2s ease-out;
-                }
-
-                .animate-scale-in {
-                    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .line-clamp-2 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-            `}</style>
         </section>
     );
 };

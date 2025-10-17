@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
-  const backendURL = " http://localhost:5000";
+  const backendURL = "http://localhost:5000"; // removed extra space
   const router = useRouter();
 
   const [token, setToken] = useState(null);
@@ -24,7 +24,7 @@ const ContextProvider = ({ children }) => {
       setToken(savedToken);
       fetchMail(savedToken);
       fetchPrices(savedToken);
-      fetchProjects();
+      fetchProjects(savedToken);
     }
     setLoading(false);
   }, []);
@@ -57,7 +57,7 @@ const ContextProvider = ({ children }) => {
     router.push("/login");
   };
 
-  // Fetch mail
+  // ===== Mail / Queries =====
   const fetchMail = async (authToken) => {
     if (!authToken) return;
     try {
@@ -70,7 +70,21 @@ const ContextProvider = ({ children }) => {
     }
   };
 
-  // Fetch prices
+  const removeQuery = async (id) => {
+    if (!token) return toast.error("You are not logged in!");
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get(`${backendURL}/api/query/remove?id=${id}`, config);
+      if (response.data.success) {
+        toast.success("Query removed successfully");
+        await fetchMail(token);
+      } else toast.error(response.data.message);
+    } catch (error) {
+      toast.error(error.message || "Failed to remove query");
+    }
+  };
+
+  // ===== Prices =====
   const fetchPrices = async (authToken) => {
     if (!authToken) return;
     try {
@@ -83,7 +97,6 @@ const ContextProvider = ({ children }) => {
     }
   };
 
-  // Add price
   const addPricePlan = async (plan) => {
     if (!token) return toast.error("You are not logged in!");
     try {
@@ -98,7 +111,6 @@ const ContextProvider = ({ children }) => {
     }
   };
 
-  // Remove price
   const removePricePlan = async (id) => {
     if (!token) return toast.error("You are not logged in!");
     try {
@@ -117,11 +129,8 @@ const ContextProvider = ({ children }) => {
   const fetchProjects = async () => {
     try {
       const response = await axios.post(`${backendURL}/api/project/all`);
-      if (response.data.success) {
-        setProjects(response.data.projects || []);
-      } else {
-        toast.error(response.data.message || "Failed to fetch projects");
-      }
+      if (response.data.success) setProjects(response.data.projects || []);
+      else toast.error(response.data.message || "Failed to fetch projects");
     } catch (error) {
       toast.error(error.message || "Failed to fetch projects");
     }
@@ -166,7 +175,7 @@ const ContextProvider = ({ children }) => {
     loading,
     mail,
     fetchMail,
-    setMail,
+    removeQuery,
     price,
     fetchPrices,
     addPricePlan,

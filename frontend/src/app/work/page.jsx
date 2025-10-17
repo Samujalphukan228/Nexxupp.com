@@ -1,44 +1,27 @@
-"use client"; // Required because Button uses hooks
+"use client";
 
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import PopupV1 from "@/components/PopupV1"; // Import PopupV1
+import PopupV1 from "@/components/PopupV1";
+import { AppContext } from "@/context/Context"; // import your context
 
 export default function Work() {
+  const { projects, fetchProjects } = useContext(AppContext);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  useEffect(() => {
+    fetchProjects(); // fetch projects from backend on mount
+  }, []);
 
   const handleContinue = () => {
     setIsPopupOpen(false);
-    window.location.href = "/pricing"; 
+    window.location.href = "/pricing";
   };
 
-  const projects = [
-    {
-      title: "Portfolio Website",
-      description: "A personal portfolio built with Next.js and Tailwind CSS.",
-      image: "https://picsum.photos/id/1015/800/600",
-      link: "https://portfolite.framer.website/",
-      tags: ["Next.js", "Tailwind CSS"],
-      year: "2024",
-    },
-    {
-      title: "E-commerce Store",
-      description: "A modern e-commerce store using React and Stripe API.",
-      image: "https://picsum.photos/id/1025/800/600",
-      link: "https://forever-five-iota.vercel.app/",
-      tags: ["React", "Stripe"],
-      year: "2024",
-    },
-    {
-      title: "Company site",
-      description: "A headless CMS blog powered by Next.js and Sanity.io.",
-      image: "https://picsum.photos/id/1040/800/600",
-      link: "https://better-closet-732185.framer.app/",
-      tags: ["Next.js", "Sanity.io"],
-      year: "2023",
-    },
-  ];
+  if (!projects || projects.length === 0) {
+    return <p className="text-center py-12 text-gray-500">No projects to display.</p>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -68,7 +51,7 @@ export default function Work() {
                 Available for work
               </span>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
+                <div className="w-2 h-2 rounded-full bg-[#11ff09] animate-pulse"></div>
                 <span className="text-xs text-gray-600 font-medium">
                   Currently accepting projects
                 </span>
@@ -162,7 +145,7 @@ export default function Work() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag, tagIndex) => (
+                    {project.tags?.map((tag, tagIndex) => (
                       <span
                         key={tagIndex}
                         className="text-[9px] tracking-[0.15em] uppercase text-gray-500 font-medium px-2.5 py-1.5 border border-gray-200 rounded-sm hover:border-gray-400 hover:text-gray-700 transition-all duration-500"
@@ -212,7 +195,7 @@ export default function Work() {
             </div>
 
             <Button
-              onClick={() => setIsPopupOpen(true)} // Open Popup
+              onClick={() => setIsPopupOpen(true)}
               className="group bg-black text-white text-[11px] tracking-[0.2em] uppercase font-semibold px-8 sm:px-12 py-6 sm:py-7 rounded-full mt-4 mb-12 sm:mb-20 hover:bg-gray-800 transition-all duration-500 ease-out flex items-center gap-4"
             >
               Talk to us

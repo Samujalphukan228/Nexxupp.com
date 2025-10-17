@@ -180,3 +180,19 @@ export const getAllQueries = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+
+export const removeQueies = async (req, res) => {
+    try {
+        const { id } = req.query; // get ID from query parameters
+        if (!id) return res.status(400).json({ success: false, message: "Query ID is required" });
+
+        const deleted = await queryModel.findByIdAndDelete(id);
+        if (!deleted) return res.status(404).json({ success: false, message: "Query not found" });
+
+        res.json({ success: true, message: "Query removed successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

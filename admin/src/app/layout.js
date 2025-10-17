@@ -1,5 +1,6 @@
-"use client"; // Must remove metadata export
+'use client'; // Mark this as a client component
 
+import { useEffect, useState } from "react";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -15,11 +16,18 @@ const outfit = Outfit({
 });
 
 export default function RootLayout({ children }) {
+  const [mounted, setMounted] = useState(false);
+
+  // Ensures client-only rendering for hydration-safe content
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <html lang="en">
-      <body className={outfit.className}>
+      <body className={mounted ? outfit.className : ""}>
         <ContextProvider>
-          <LayoutContent>{children}</LayoutContent>
+          {mounted ? <LayoutContent>{children}</LayoutContent> : null}
         </ContextProvider>
         <ToastContainer position="top-middle" autoClose={3000} />
       </body>
@@ -31,11 +39,10 @@ function LayoutContent({ children }) {
   const { token, loading } = useAppContext();
 
   if (loading) {
-    // Wait for token to load from localStorage
-    return null; // or a spinner if you want
+    return null; // or a spinner
   }
 
-  if (!token) return <Login />; // show login only if no token
+  if (!token) return <Login />; // show login only if not logged in
 
   return (
     <>

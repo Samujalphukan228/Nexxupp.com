@@ -5,7 +5,7 @@ import streamifier from "streamifier";
 // Function to create a new project
 export const createProject = async (req, res) => {
   try {
-    const { title, description, category } = req.body;
+    const { title, description, category, link } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "Image file is required" });
@@ -32,6 +32,7 @@ export const createProject = async (req, res) => {
       description,
       category,
       image: result.secure_url,
+      link
     });
 
     res.status(201).json({
