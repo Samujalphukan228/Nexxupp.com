@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import Script from "next/script"; // import Script
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContextProvider from "@/context/Context";
@@ -18,6 +19,21 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
+      <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-6DXKD8YWEC"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-6DXKD8YWEC');
+          `}
+        </Script>
+      </head>
       <body 
         className="flex flex-col min-h-screen bg-[#f9f9f9]"
         suppressHydrationWarning
