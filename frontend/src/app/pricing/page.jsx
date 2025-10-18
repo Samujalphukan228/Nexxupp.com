@@ -71,10 +71,7 @@ export default function PricingCards() {
 
                                     <div className="flex items-baseline gap-2">
                                         <span className="text-[2.5rem] sm:text-[3rem] font-extralight tracking-tight text-gray-900">
-                                            ${plan.price}
-                                        </span>
-                                        <span className="text-[14px] font-light text-gray-400">
-                                            /mo
+                                            ₹{plan.price}
                                         </span>
                                     </div>
                                 </div>
