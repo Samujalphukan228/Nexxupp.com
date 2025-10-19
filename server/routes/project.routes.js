@@ -5,8 +5,6 @@ import { adminAuth } from '../middleware/admin.middleware.js'
 
 const projectRouter = express.Router()
 
-
-
 projectRouter.post('/add', adminAuth, upload.single('image'), createProject);
 projectRouter.post('/all', listProjects)
 projectRouter.post('/remove', adminAuth, removeProjects);
