@@ -151,13 +151,6 @@ const Navbar = () => {
                                     </Link>
                                 ))}
                             </nav>
-
-                            {/* CTA */}
-                            <div className="mt-auto">
-                                <button className="w-full bg-black text-white py-3.5 rounded-full text-sm font-medium hover:bg-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl">
-                                    Get Started
-                                </button>
-                            </div>
                         </motion.div>
                     </>
                 )}
