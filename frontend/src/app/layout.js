@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Script from "next/script"; // import Script
+import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContextProvider from "@/context/Context";
@@ -20,7 +20,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics */}
+        {/* 🔹 Single Favicon */}
+        <link rel="icon" href="/favicon.ico" />
+
+        {/* 🔹 Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-6DXKD8YWEC"
           strategy="afterInteractive"
@@ -34,7 +37,8 @@ export default function RootLayout({ children }) {
           `}
         </Script>
       </head>
-      <body 
+
+      <body
         className="flex flex-col min-h-screen bg-[#f9f9f9]"
         suppressHydrationWarning
       >
