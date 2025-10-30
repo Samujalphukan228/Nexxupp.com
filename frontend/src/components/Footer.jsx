@@ -2,13 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { Twitter, Linkedin, Instagram } from "lucide-react";
+import { Twitter, Linkedin, Facebook  } from "lucide-react";
 
 const footerLinks = {
     company: {
         name: "NexxUpp",
         description: "Building modern web experiences with style and simplicity.",
-        address: "123 Web Avenue, Bangalore, India",
+        address: "Assam, India",
         email: "contact@nexxupp.com",
     },
     quickLinks: [
@@ -22,9 +22,9 @@ const footerLinks = {
         { name: "Privacy Policy", href: "/privacy" },
     ],
     social: [
-        { icon: <Twitter size={18} />, href: "https://twitter.com" },
-        { icon: <Instagram size={18} />, href: "https://instagram.com" },
-        { icon: <Linkedin size={18} />, href: "https://linkedin.com" },
+        { icon: <Twitter size={18} />, href: "https://x.com/nexxupp110286" },
+        { icon: <Facebook size={18} />, href: "https://www.facebook.com/Nexxupp/" },
+        // { icon: <Linkedin size={18} />, href: "https://linkedin.com" },
     ],
 };
 
