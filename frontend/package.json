@@ -2,16 +2,16 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",  
-  "start": "next start",
-  "lint": "eslint"
-},
-
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-slot": "^1.2.3",
+    "@studio-freight/lenis": "^1.0.42",
     "axios": "^1.12.2",
     "build": "^0.1.4",
     "class-variance-authority": "^0.7.1",

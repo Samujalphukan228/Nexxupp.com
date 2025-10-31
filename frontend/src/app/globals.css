@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* ✅ Define theme variables */
+/* ✅ THEME VARIABLES */
 @theme inline {
   /* Light mode colors */
   --color-background: 0 0% 100%;
@@ -9,7 +9,7 @@
   --color-border: 240 5.9% 90%;
   --color-ring: 240 5.9% 10%;
 
-  /* Dark mode overrides */
+  /* Accordion animations */
   @keyframes accordion-down {
     from {
       height: 0;
@@ -29,10 +29,10 @@
   }
 }
 
-/* ✅ Define dark mode variant */
+/* ✅ DARK MODE VARIANT */
 @variant dark (&:is(.dark *)) {}
 
-/* ✅ Apply base styles */
+/* ✅ BASE STYLES */
 @layer base {
   * {
     @apply border-[hsl(var(--color-border))] outline-[hsl(var(--color-ring))]/50;
@@ -42,34 +42,50 @@
   }
 }
 
-
+/* ✅ Hide Next.js error overlay in production */
 #__next_dev_overlay {
   display: none !important;
 }
 
-/* Apply to the whole page */
+/* ✅ SELECTION (text highlight) */
 ::selection {
-  background-color: black; /* background when text is selected */
-  color: white;            /* text color when selected */
+  background-color: black;
+  color: white;
 }
 
-/* Firefox */
+/* Firefox selection */
 ::-moz-selection {
   background-color: black;
   color: white;
 }
 
-
-/* Add to your global.css */
+/* ✅ SHIMMER ANIMATION */
 @keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .animate-shimmer {
-    animation: shimmer 1.5s ease-in-out infinite;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ✅ ✅ GLOBAL SCROLLBAR HIDE (Lenis compatible) */
+
+/* Chrome, Safari, Edge */
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+html {
+  scrollbar-width: none;
+}
+
+/* Any scrollable div */
+::-webkit-scrollbar {
+  display: none;
 }

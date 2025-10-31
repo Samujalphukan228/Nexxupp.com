@@ -7,7 +7,8 @@ import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContextProvider from "@/context/Context";
-import Loader from "@/app/loading"; // ✅ Add this
+import Loader from "@/app/loading"; 
+import SmoothScrollProvider from "@/components/SmoothScrollProvider"; // ✅ ADD THIS
 import "./globals.css";
 
 export default function RootLayout({ children }) {
@@ -40,14 +41,20 @@ export default function RootLayout({ children }) {
 
       <body className="flex flex-col min-h-screen bg-[#f9f9f9]" suppressHydrationWarning>
         <ContextProvider>
-          
-          {/* ✅ GLOBAL LOADER FIXED HERE */}
-          <Loader />
 
-          {/* ✅ MAIN LAYOUT */}
-          <Navbar />
-          <main className="pt-20 flex-grow px-2">{children}</main>
-          <Footer />
+          {/* ✅ SMOOTH SCROLL WRAPPER */}
+          <SmoothScrollProvider>
+
+            {/* ✅ GLOBAL LOADER */}
+            <Loader />
+
+            {/* ✅ MAIN LAYOUT */}
+            <Navbar />
+            <main className="pt-20 flex-grow px-2">{children}</main>
+            <Footer />
+
+          </SmoothScrollProvider>
+
         </ContextProvider>
       </body>
     </html>
