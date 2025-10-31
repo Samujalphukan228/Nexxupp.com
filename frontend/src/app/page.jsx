@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Hero from "@/components/Hero";
-import Move from "@/components/Move";
-import MainImage from "@/components/MainImage";
 import { Feature197 } from "@/components/accordion1";
 import { myFeatures, myFeatures2 } from "@/assets/assets";
 import { Feature199 } from "@/components/according2";
@@ -32,14 +29,11 @@ const Page = () => {
 
   return (
     <div className="mt-4 flex flex-col items-center gap-12 sm:gap-16 lg:gap-20">
-      {/* Intro Animation */}
-      <Move />
+
 
       {/* Hero Section */}
       <Hero />
 
-      {/* Main Image */}
-      <MainImage />
 
       {/* First Feature Section */}
       <div className="w-full">

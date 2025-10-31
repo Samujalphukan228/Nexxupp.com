@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import PopupV1 from "@/components/PopupV1";
 import { motion } from "framer-motion";
+import Move from "@/components/Move";
+import MainImage from "@/components/MainImage";
 
 function Hero() {
     const [open, setOpen] = useState(false);
@@ -33,45 +35,61 @@ function Hero() {
     };
 
     return (
-        <motion.div
-            className="text-center px-4 sm:px-6 md:px-8 py-2 sm:py-1 md:py-1"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-        >
-            {/* Heading */}
-            <motion.h1
-                className="text-4xl sm:text-5xl md:text-6xl leading-tight font-serif"
-                variants={itemVariants}
-            >
-                Build your dream site with <br className="hidden md:block" />
-                Nexxupp.com
-            </motion.h1>
+        <>
+            {/* Hero Content Section */}
+            <section className="w-full pt-8 sm:pt-12 md:pt-14 pb-6 sm:pb-8 md:pb-10">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+                    <motion.div
+                        className="text-center"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        {/* Move Component */}
+                        <Move />
 
-            {/* Paragraph */}
-            <motion.p
-                className="text-base sm:text-lg mt-3 sm:mt-4 max-w-2xl mx-auto text-gray-500 leading-relaxed"
-                variants={itemVariants}
-            >
-                Nexxupp delivers professional, high-quality websites designed for businesses and teams aiming to make a lasting impact online.
-            </motion.p>
+                        {/* Heading */}
+                        <motion.h1
+                            className="text-3xl sm:text-4xl md:text-5xl leading-tight font-serif text-gray-900 mt-6 sm:mt-8"
+                            variants={itemVariants}
+                        >
+                            Build your dream site with{" "}
+                            <br className="hidden sm:block" />
+                            Nexxupp.com
+                        </motion.h1>
 
-            {/* Button */}
-            <motion.div variants={itemVariants}>
-                <Button
-                    className="bg-black text-white px-6 sm:px-8 py-3 rounded-full mt-4 sm:mt-6 hover:bg-gray-900 transition-colors"
-                    onClick={handleNavigate}
-                >
-                    Talk to us
-                </Button>
-            </motion.div>
+                        {/* Paragraph */}
+                        <motion.p
+                            className="text-sm sm:text-base mt-4 sm:mt-5 max-w-2xl mx-auto text-gray-600 leading-relaxed"
+                            variants={itemVariants}
+                        >
+                            Nexxupp delivers professional, high-quality websites designed for businesses and teams aiming to make a lasting impact online.
+                        </motion.p>
+
+                        {/* Button */}
+                        <motion.div variants={itemVariants} className="mt-6 sm:mt-7">
+                            <Button
+                                className="bg-black text-white px-8 sm:px-10 py-3 sm:py-3.5 text-sm sm:text-base rounded-full hover:bg-gray-900 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
+                                onClick={handleNavigate}
+                            >
+                                Talk to us
+                            </Button>
+                        </motion.div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Main Image Section */}
+            <section className="w-full">
+                <MainImage />
+            </section>
 
             <PopupV1
                 open={open}
                 onCancel={handleCancel}
                 onContinue={handleContinue}
             />
-        </motion.div>
+        </>
     );
 }
 
