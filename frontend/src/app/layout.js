@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContextProvider from "@/context/Context";
 import Loader from "@/app/loading"; 
 import SmoothScrollProvider from "@/components/SmoothScrollProvider"; // ✅ ADD THIS
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
+
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
@@ -50,7 +51,7 @@ export default function RootLayout({ children }) {
 
             {/* ✅ MAIN LAYOUT */}
             <Navbar />
-            <main className="pt-20 flex-grow px-2">{children}</main>
+            <main className="pt-20 flex-grow px-2"><ScrollToTop/> {children}</main>
             <Footer />
 
           </SmoothScrollProvider>
