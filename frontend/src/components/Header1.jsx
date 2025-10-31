@@ -12,7 +12,6 @@ const Header1 = ({ text1, text2 }) => {
                         <div className="absolute inset-0 rounded-full bg-blue-500 opacity-40 animate-pulse"></div>
                         <div className="relative w-2 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-lg shadow-blue-500/50 animate-pulse"></div>
                     </div>
-
                     <h2 className={`${trirong.className} text-[12px]  text-gray-600 uppercase tracking-wider`}>{text1}</h2>
                 </div>
                 <div>
