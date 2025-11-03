@@ -24,4 +24,5 @@ const Header1 = ({ text1, text2 }) => {
     )
 }
 
+
 export default Header1
