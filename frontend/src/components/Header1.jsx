@@ -3,6 +3,7 @@ import {trirong} from '@/fonts/fonts'
 import { oranienbaum } from '@/fonts/fonts';
 
 
+
 const Header1 = ({ text1, text2 }) => {
     return (
         <div className="w-full py-8 px-4 flex justify-center mt-22">
