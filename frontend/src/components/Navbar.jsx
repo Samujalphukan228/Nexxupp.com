@@ -390,7 +390,7 @@ const MobileMenu = memo(({ isOpen, onClose, pathname }) => {
             {/* Menu */}
             <div
                 ref={menuRef}
-                className="fixed top-0 right-0 bottom-0 w-80 bg-white z-50 shadow-2xl flex flex-col"
+                className="fixed top-0 right-0 bottom-0 w-80 bg-[#f9f9f9] z-50 shadow-xl flex flex-col"
             >
                 {/* Header */}
                 <div 
