@@ -12,6 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function PricingCards() {
     const { price, fetchPrices } = useContext(AppContext);
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
 
     // Refs for animations
     const headerRef = useRef(null);
@@ -21,26 +22,55 @@ export default function PricingCards() {
     const headerTitleRef = useRef(null);
     const headerDescRef = useRef(null);
 
-    const cardRefs = useRef([]); // each pricing card
+    const cardRefs = useRef([]);
     const bottomInfoRef = useRef(null);
 
+    // Initialize cardRefs array when price changes
     useEffect(() => {
-        if (!price.length) {
-            fetchPrices();
+        if (price?.length) {
+            cardRefs.current = cardRefs.current.slice(0, price.length);
         }
-    }, []);
+    }, [price?.length]);
+
+    // Fetch prices on mount
+    useEffect(() => {
+        const loadPrices = async () => {
+            if (!price || price.length === 0) {
+                try {
+                    await fetchPrices();
+                } catch (error) {
+                    console.error("Failed to fetch prices:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setIsLoading(false);
+            }
+        };
+
+        loadPrices();
+    }, [fetchPrices, price]);
 
     const handleChoosePlan = (planId) => {
+        if (!planId) {
+            console.error("Invalid plan ID");
+            return;
+        }
         router.push(`/contact?priceCardId=${planId}`);
     };
 
+    // GSAP Animations with proper cleanup
     useGSAP(
         () => {
-            const reduce =
+            // Check for reduced motion preference
+            const reduceMotion =
                 typeof window !== "undefined" &&
                 window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-            if (reduce || !price || price.length === 0) return;
+            if (reduceMotion || !price || price.length === 0) return;
+
+            // Store ScrollTrigger instances for cleanup
+            const scrollTriggers = [];
 
             // Header entrance timeline
             const tlHeader = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -85,8 +115,12 @@ export default function PricingCards() {
                         trigger: card,
                         start: "top 85%",
                         toggleActions: "play none none none",
+                        once: true, // Only animate once
                     },
                 });
+
+                // Store the ScrollTrigger instance
+                scrollTriggers.push(tl.scrollTrigger);
 
                 tl.from(card, { opacity: 0, y: 28, scale: 0.98, duration: 0.6 });
 
@@ -110,23 +144,68 @@ export default function PricingCards() {
 
             // Bottom info reveal
             if (bottomInfoRef.current) {
-                gsap.from(bottomInfoRef.current, {
-                    opacity: 0,
-                    y: 20,
-                    duration: 0.6,
-                    ease: "power3.out",
+                const bottomTL = gsap.timeline({
                     scrollTrigger: {
                         trigger: bottomInfoRef.current,
                         start: "top 90%",
                         toggleActions: "play none none none",
+                        once: true,
                     },
                 });
+
+                scrollTriggers.push(bottomTL.scrollTrigger);
+
+                bottomTL.from(bottomInfoRef.current, {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.6,
+                    ease: "power3.out",
+                });
             }
+
+            // Cleanup function
+            return () => {
+                scrollTriggers.forEach((trigger) => {
+                    if (trigger) trigger.kill();
+                });
+                tlHeader.kill();
+            };
         },
-        [price]
+        { dependencies: [price?.length], scope: headerRef } // Only re-run when price count changes
     );
 
-    if (!price.length) return null; // Show global loader
+    // Loading state - MUST be after all hooks
+    if (isLoading) {
+        return (
+            <div className="py-20 sm:py-32 px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto text-center">
+                    <div className="inline-flex items-center gap-3">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <p className="mt-4 text-gray-500 text-sm">Loading pricing...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // No data state
+    if (!price || price.length === 0) {
+        return (
+            <div className="py-20 sm:py-32 px-4 sm:px-8">
+                <div className="max-w-7xl mx-auto text-center">
+                    <p className="text-gray-500">No pricing plans available at the moment.</p>
+                    <button
+                        onClick={() => router.push("/contact")}
+                        className="mt-6 inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-800 transition-colors"
+                    >
+                        Contact Us for Custom Pricing
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="py-20 sm:py-32 px-4 sm:px-8">
@@ -161,74 +240,85 @@ export default function PricingCards() {
 
                 {/* Pricing Cards */}
                 <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                    {price.map((plan, idx) => (
-                        <div
-                            key={plan._id}
-                            ref={(el) => (cardRefs.current[idx] = el)}
-                            className={`group relative border rounded-lg p-8 sm:p-10 transition-all duration-700 ease-out flex flex-col h-full ${plan.popular ? "border-gray-800 shadow-sm scale-[1.02]" : "border-gray-200 hover:border-gray-400 hover:shadow-sm"
+                    {price.map((plan, idx) => {
+                        if (!plan?._id) return null; // Safety check
+
+                        return (
+                            <div
+                                key={plan._id}
+                                ref={(el) => {
+                                    if (el) cardRefs.current[idx] = el;
+                                }}
+                                className={`group relative border rounded-lg p-8 sm:p-10 transition-all duration-700 ease-out flex flex-col h-full ${
+                                    plan.popular
+                                        ? "border-gray-800 shadow-sm scale-[1.02]"
+                                        : "border-gray-200 hover:border-gray-400 hover:shadow-sm"
                                 }`}
-                        >
-                            {/* Popular Badge */}
-                            {plan.popular && (
-                                <div
-                                    data-badge="popular"
-                                    className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-[10px] font-medium tracking-[0.2em] uppercase px-4 py-1.5 rounded-sm"
-                                >
-                                    Most Popular
-                                </div>
-                            )}
+                            >
+                                {/* Popular Badge */}
+                                {plan.popular && (
+                                    <div
+                                        data-badge="popular"
+                                        className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-[10px] font-medium tracking-[0.2em] uppercase px-4 py-1.5 rounded-sm"
+                                    >
+                                        Most Popular
+                                    </div>
+                                )}
 
-                            {/* Content */}
-                            <div className="flex flex-col h-full">
-                                {/* Header */}
-                                <div className="space-y-4 pb-6 border-b border-gray-100">
-                                    <h3 className="text-[1.25rem] sm:text-[1.5rem] font-light tracking-tight text-gray-900 group-hover:text-gray-800 transition-colors duration-500">
-                                        {plan.category}
-                                    </h3>
+                                {/* Content */}
+                                <div className="flex flex-col h-full">
+                                    {/* Header */}
+                                    <div className="space-y-4 pb-6 border-b border-gray-100">
+                                        <h3 className="text-[1.25rem] sm:text-[1.5rem] font-light tracking-tight text-gray-900 group-hover:text-gray-800 transition-colors duration-500">
+                                            {plan.category || "Plan"}
+                                        </h3>
 
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-[2.5rem] sm:text-[3rem] font-extralight tracking-tight text-gray-900">
-                                            ₹{plan.price}
-                                        </span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-[2.5rem] sm:text-[3rem] font-extralight tracking-tight text-gray-900">
+                                                ₹{plan.price || 0}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Features */}
+                                    <ul className="space-y-3 py-6 flex-grow">
+                                        {(plan.features || []).map((feature, featureIdx) => (
+                                            <li key={`${plan._id}-feature-${featureIdx}`} className="flex items-start gap-2.5">
+                                                <svg
+                                                    className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-600 group-hover:text-gray-700 transition-colors duration-500"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span className="text-[13px] sm:text-[14px] leading-[1.6] font-light text-gray-500">
+                                                    {feature}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* CTA Button */}
+                                    <div className="pt-6 mt-auto">
+                                        <button
+                                            onClick={() => handleChoosePlan(plan._id)}
+                                            className="group/btn bg-black text-white text-[12px] sm:text-[13px] tracking-[0.25em] uppercase font-semibold px-8 sm:px-10 py-5 sm:py-6 rounded-xl hover:bg-gray-800 transition-all duration-500 ease-out flex items-center justify-center gap-4 w-full cursor-pointer"
+                                            aria-label={`Choose ${plan.category} plan`}
+                                        >
+                                            Talk to us
+                                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/20 flex items-center justify-center group-hover/btn:border-white/40 transition-all duration-500">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                </svg>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
-
-                                {/* Features */}
-                                <ul className="space-y-3 py-6 flex-grow">
-                                    {(plan.features || []).map((feature) => (
-                                        <li key={feature} className="flex items-start gap-2.5">
-                                            <svg
-                                                className="w-4 h-4 mt-0.5 flex-shrink-0 text-gray-600 group-hover:text-gray-700 transition-colors duration-500"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <span className="text-[13px] sm:text-[14px] leading-[1.6] font-light text-gray-500">
-                                                {feature}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                {/* CTA Button */}
-                                <div className="pt-6 mt-auto">
-                                    <button
-                                        onClick={() => handleChoosePlan(plan._id)}
-                                        className="group bg-black text-white text-[12px] sm:text-[13px] tracking-[0.25em] uppercase font-semibold px-8 sm:px-10 py-5 sm:py-6 rounded-xl hover:bg-gray-800 transition-all duration-500 ease-out flex items-center justify-center gap-4 w-full sm:w-auto sm:flex-shrink-0 cursor-pointer"
-                                    >
-                                        Talk to us
-                                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-white/20 flex items-center justify-center group-hover:border-white/40 transition-all duration-500">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                            </svg>
-                                        </div>
-                                    </button>
-                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Bottom Info */}
@@ -238,10 +328,11 @@ export default function PricingCards() {
                     </p>
                     <button
                         onClick={() => router.push("/contact")}
-                        className="inline-flex items-center gap-3 text-gray-700 text-[13px] font-medium group cursor-pointer hover:gap-4 transition-all duration-500 ease-out"
+                        className="inline-flex items-center gap-3 text-gray-700 text-[13px] font-medium group/link cursor-pointer hover:gap-4 transition-all duration-500 ease-out"
+                        aria-label="Contact for custom solution"
                     >
                         <span className="tracking-wider">Need a custom solution?</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </button>
