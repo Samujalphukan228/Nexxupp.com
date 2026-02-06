@@ -52,21 +52,24 @@ const DesktopDropdown = memo(({ items, isOpen }) => {
                 }
             );
 
-            tl.fromTo(
-                itemsRef.current,
-                {
-                    opacity: 0,
-                    x: -15
-                },
-                {
-                    opacity: 1,
-                    x: 0,
-                    duration: 0.4,
-                    stagger: 0.06,
-                    ease: "power3.out"
-                },
-                "-=0.3"
-            );
+            const validItems = itemsRef.current.filter(item => item !== null);
+            if (validItems.length > 0) {
+                tl.fromTo(
+                    validItems,
+                    {
+                        opacity: 0,
+                        x: -15
+                    },
+                    {
+                        opacity: 1,
+                        x: 0,
+                        duration: 0.4,
+                        stagger: 0.06,
+                        ease: "power3.out"
+                    },
+                    "-=0.3"
+                );
+            }
         } else if (dropdownRef.current) {
             gsap.to(dropdownRef.current, {
                 opacity: 0,
@@ -93,7 +96,9 @@ const DesktopDropdown = memo(({ items, isOpen }) => {
                     {items.map((item, index) => (
                         <div
                             key={item.href}
-                            ref={(el) => (itemsRef.current[index] = el)}
+                            ref={(el) => {
+                                if (el) itemsRef.current[index] = el;
+                            }}
                         >
                             <Link
                                 href={item.href}
@@ -104,11 +109,14 @@ const DesktopDropdown = memo(({ items, isOpen }) => {
                                         duration: 0.4,
                                         ease: "power2.out"
                                     });
-                                    gsap.to(e.currentTarget.querySelector('.chevron'), {
-                                        x: 5,
-                                        duration: 0.4,
-                                        ease: "back.out(2)"
-                                    });
+                                    const chevron = e.currentTarget.querySelector('.chevron');
+                                    if (chevron) {
+                                        gsap.to(chevron, {
+                                            x: 5,
+                                            duration: 0.4,
+                                            ease: "back.out(2)"
+                                        });
+                                    }
                                 }}
                                 onMouseLeave={(e) => {
                                     gsap.to(e.currentTarget, {
@@ -116,11 +124,14 @@ const DesktopDropdown = memo(({ items, isOpen }) => {
                                         duration: 0.4,
                                         ease: "power2.out"
                                     });
-                                    gsap.to(e.currentTarget.querySelector('.chevron'), {
-                                        x: 0,
-                                        duration: 0.4,
-                                        ease: "power2.out"
-                                    });
+                                    const chevron = e.currentTarget.querySelector('.chevron');
+                                    if (chevron) {
+                                        gsap.to(chevron, {
+                                            x: 0,
+                                            duration: 0.4,
+                                            ease: "power2.out"
+                                        });
+                                    }
                                 }}
                             >
                                 <span className="font-medium tracking-wide">{item.name}</span>
@@ -262,18 +273,21 @@ const MobileSubmenu = memo(({ items, isOpen }) => {
                 }
             );
 
-            tl.fromTo(
-                itemsRef.current,
-                { x: -25, opacity: 0 },
-                {
-                    x: 0,
-                    opacity: 1,
-                    duration: 0.4,
-                    stagger: 0.08,
-                    ease: "back.out(1.7)"
-                },
-                "-=0.3"
-            );
+            const validItems = itemsRef.current.filter(item => item !== null);
+            if (validItems.length > 0) {
+                tl.fromTo(
+                    validItems,
+                    { x: -25, opacity: 0 },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        duration: 0.4,
+                        stagger: 0.08,
+                        ease: "back.out(1.7)"
+                    },
+                    "-=0.3"
+                );
+            }
         } else if (submenuRef.current) {
             gsap.to(submenuRef.current, {
                 height: 0,
@@ -294,7 +308,9 @@ const MobileSubmenu = memo(({ items, isOpen }) => {
                 {items.map((item, index) => (
                     <div
                         key={item.href}
-                        ref={(el) => (itemsRef.current[index] = el)}
+                        ref={(el) => {
+                            if (el) itemsRef.current[index] = el;
+                        }}
                     >
                         <Link
                             href={item.href}
@@ -310,14 +326,27 @@ const MobileSubmenu = memo(({ items, isOpen }) => {
 });
 MobileSubmenu.displayName = "MobileSubmenu";
 
-// Mobile Menu - Full Screen with Margins
+// Mobile Menu - Full Screen with Margins (FIXED with null checks)
 const MobileMenu = memo(({ isOpen, onClose, pathname }) => {
     const [expandedItems, setExpandedItems] = useState({});
+    const [shouldRender, setShouldRender] = useState(false);
     const backdropRef = useRef(null);
     const menuRef = useRef(null);
     const headerRef = useRef(null);
     const navItemsRef = useRef([]);
     const ctaRef = useRef(null);
+
+    // Initialize refs array properly
+    useEffect(() => {
+        navItemsRef.current = navItemsRef.current.slice(0, navLinks.length);
+    }, []);
+
+    // Control rendering state
+    useEffect(() => {
+        if (isOpen) {
+            setShouldRender(true);
+        }
+    }, [isOpen]);
 
     useGSAP(() => {
         if (isOpen) {
@@ -326,82 +355,135 @@ const MobileMenu = memo(({ isOpen, onClose, pathname }) => {
             });
 
             // Backdrop animation
-            tl.fromTo(
-                backdropRef.current,
-                { opacity: 0 },
-                { opacity: 1, duration: 0.4 }
-            );
+            if (backdropRef.current) {
+                tl.fromTo(
+                    backdropRef.current,
+                    { opacity: 0 },
+                    { opacity: 1, duration: 0.4 }
+                );
+            }
 
             // Menu slide in with scale
-            tl.fromTo(
-                menuRef.current,
-                { 
-                    x: "100%",
-                    scale: 0.95,
-                    opacity: 0
-                },
-                { 
-                    x: 0, 
-                    scale: 1,
-                    opacity: 1,
-                    duration: 0.7,
-                    ease: "power4.out"
-                },
-                "-=0.2"
-            );
+            if (menuRef.current) {
+                tl.fromTo(
+                    menuRef.current,
+                    { 
+                        x: "100%",
+                        scale: 0.95,
+                        opacity: 0
+                    },
+                    { 
+                        x: 0, 
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.7,
+                        ease: "power4.out"
+                    },
+                    "-=0.2"
+                );
+            }
 
             // Header animation
-            tl.fromTo(
-                headerRef.current,
-                { opacity: 0, y: -30 },
-                { opacity: 1, y: 0, duration: 0.5 },
-                "-=0.4"
-            );
+            if (headerRef.current) {
+                tl.fromTo(
+                    headerRef.current,
+                    { opacity: 0, y: -30 },
+                    { opacity: 1, y: 0, duration: 0.5 },
+                    "-=0.4"
+                );
+            }
 
-            // Nav items stagger
-            tl.fromTo(
-                navItemsRef.current,
-                { x: 60, opacity: 0 },
-                {
-                    x: 0,
-                    opacity: 1,
-                    duration: 0.5,
-                    stagger: 0.1,
-                    ease: "back.out(1.7)"
-                },
-                "-=0.4"
-            );
+            // Nav items stagger - Filter out null values
+            const validNavItems = navItemsRef.current.filter(item => item !== null);
+            if (validNavItems.length > 0) {
+                tl.fromTo(
+                    validNavItems,
+                    { x: 60, opacity: 0 },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        duration: 0.5,
+                        stagger: 0.1,
+                        ease: "back.out(1.7)"
+                    },
+                    "-=0.4"
+                );
+            }
 
             // CTA button
-            tl.fromTo(
-                ctaRef.current,
-                { y: 30, opacity: 0, scale: 0.9 },
-                { 
-                    y: 0, 
-                    opacity: 1, 
-                    scale: 1,
-                    duration: 0.6,
-                    ease: "back.out(2)"
-                },
-                "-=0.3"
-            );
-        } else if (backdropRef.current && menuRef.current) {
-            const tl = gsap.timeline();
-            
-            tl.to(menuRef.current, {
-                x: "100%",
-                scale: 0.95,
-                opacity: 0,
-                duration: 0.5,
-                ease: "power3.in"
+            if (ctaRef.current) {
+                tl.fromTo(
+                    ctaRef.current,
+                    { y: 30, opacity: 0, scale: 0.9 },
+                    { 
+                        y: 0, 
+                        opacity: 1, 
+                        scale: 1,
+                        duration: 0.6,
+                        ease: "back.out(2)"
+                    },
+                    "-=0.3"
+                );
+            }
+        } else if (shouldRender) {
+            // Smooth close animation
+            const tl = gsap.timeline({
+                onComplete: () => setShouldRender(false)
             });
+            
+            // Fade out nav items first - Filter out null values
+            const validNavItems = navItemsRef.current.filter(item => item !== null);
+            if (validNavItems.length > 0) {
+                tl.to(validNavItems, {
+                    x: 30,
+                    opacity: 0,
+                    duration: 0.3,
+                    stagger: 0.03,
+                    ease: "power2.in"
+                });
+            }
 
-            tl.to(backdropRef.current, {
-                opacity: 0,
-                duration: 0.3
-            }, "-=0.3");
+            // Fade out CTA
+            if (ctaRef.current) {
+                tl.to(ctaRef.current, {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: "power2.in"
+                }, "-=0.2");
+            }
+
+            // Fade out header
+            if (headerRef.current) {
+                tl.to(headerRef.current, {
+                    opacity: 0,
+                    y: -20,
+                    duration: 0.3,
+                    ease: "power2.in"
+                }, "-=0.2");
+            }
+
+            // Slide out menu
+            if (menuRef.current) {
+                tl.to(menuRef.current, {
+                    x: "100%",
+                    scale: 0.95,
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: "power3.in"
+                }, "-=0.1");
+            }
+
+            // Fade out backdrop
+            if (backdropRef.current) {
+                tl.to(backdropRef.current, {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out"
+                }, "-=0.3");
+            }
         }
-    }, [isOpen]);
+    }, [isOpen, shouldRender]);
 
     const toggleExpanded = useCallback((href) => {
         setExpandedItems(prev => ({
@@ -410,7 +492,8 @@ const MobileMenu = memo(({ isOpen, onClose, pathname }) => {
         }));
     }, []);
 
-    if (!isOpen) return null;
+    // Use shouldRender instead of isOpen for conditional rendering
+    if (!shouldRender) return null;
 
     return (
         <>
@@ -462,7 +545,9 @@ const MobileMenu = memo(({ isOpen, onClose, pathname }) => {
                     {navLinks.map((link, index) => (
                         <div
                             key={link.href}
-                            ref={(el) => (navItemsRef.current[index] = el)}
+                            ref={(el) => {
+                                if (el) navItemsRef.current[index] = el;
+                            }}
                         >
                             {link.dropdown ? (
                                 <button
@@ -650,18 +735,24 @@ const Navbar = () => {
                             href="/" 
                             className="flex items-center group relative z-10"
                             onMouseEnter={(e) => {
-                                gsap.to(e.currentTarget.querySelector('h1'), {
-                                    scale: 1.05,
-                                    duration: 0.4,
-                                    ease: "back.out(2)"
-                                });
+                                const h1 = e.currentTarget.querySelector('h1');
+                                if (h1) {
+                                    gsap.to(h1, {
+                                        scale: 1.05,
+                                        duration: 0.4,
+                                        ease: "back.out(2)"
+                                    });
+                                }
                             }}
                             onMouseLeave={(e) => {
-                                gsap.to(e.currentTarget.querySelector('h1'), {
-                                    scale: 1,
-                                    duration: 0.4,
-                                    ease: "power2.out"
-                                });
+                                const h1 = e.currentTarget.querySelector('h1');
+                                if (h1) {
+                                    gsap.to(h1, {
+                                        scale: 1,
+                                        duration: 0.4,
+                                        ease: "power2.out"
+                                    });
+                                }
                             }}
                         >
                             <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">
