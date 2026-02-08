@@ -8,9 +8,8 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 const ContextProvider = ({ children }) => {
-  const backendURL = "https://nexxupp-com-backend.vercel.app"; // removed extra space
+  const backendURL = "https://nexxupp-com-backend.vercel.app"; 
   const router = useRouter();
-
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mail, setMail] = useState([]);
